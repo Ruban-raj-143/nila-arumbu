@@ -136,28 +136,21 @@ else:
 logger.info("Frontend dist path: %s | exists: %s", FRONTEND_DIST, FRONTEND_DIST.exists())
 
 if FRONTEND_DIST.exists():
-    # Serve /assets/* statically
+    # Serve /assets/* statically (JS, CSS, images)
     _assets_dir = FRONTEND_DIST / "assets"
     if _assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
 
-    # Serve other public files (favicon, manifest, etc.)
-    @app.get("/favicon.svg", include_in_schema=False)
-    @app.get("/manifest.webmanifest", include_in_schema=False)
-    @app.get("/registerSW.js", include_in_schema=False)
-    @app.get("/icons.svg", include_in_schema=False)
-    @app.get("/logo.svg", include_in_schema=False)
-    async def serve_public(request: Request) -> FileResponse:
-        filename = request.url.path.lstrip("/")
-        filepath = FRONTEND_DIST / filename
-        if filepath.exists():
-            return FileResponse(str(filepath))
+    async def _spa(request: Request) -> FileResponse:
+        """SPA catch-all — only called for non-API paths."""
         return FileResponse(str(FRONTEND_DIST / "index.html"))
 
-    # SPA root — must be last
-    @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_spa(full_path: str) -> FileResponse:
-        return FileResponse(str(FRONTEND_DIST / "index.html"))
+    # Mount ALL remaining paths via Starlette Route AFTER all FastAPI routes
+    # Using app.router.add_route so it sits below all existing routes
+    from starlette.routing import Route as StarletteRoute
+    app.router.routes.append(
+        StarletteRoute("/{full_path:path}", endpoint=_spa, methods=["GET"])
+    )
 
 else:
     @app.get("/", tags=["System"])
