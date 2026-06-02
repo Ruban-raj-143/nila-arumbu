@@ -2,6 +2,7 @@
 Nila Arumbu — Application Configuration
 All settings loaded from environment variables with secure defaults.
 """
+import os
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -57,13 +58,17 @@ class Settings(BaseSettings):
         "http://localhost:5174",
         "http://localhost:5175",
         "http://localhost:3000",
+        "https://nilarumbu.vercel.app",
+        "https://nila-arumbu.vercel.app",
     ]
 
     @property
     def cors_origins(self) -> list[str]:
         if self.ENVIRONMENT == "development":
             return ["*"]
-        return self.ALLOWED_ORIGINS
+        return self.ALLOWED_ORIGINS + (
+            [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+        )
 
     # ── Rate Limiting ─────────────────────────────────────────────────────────
     RATE_LIMIT_PER_MINUTE: int = 100
