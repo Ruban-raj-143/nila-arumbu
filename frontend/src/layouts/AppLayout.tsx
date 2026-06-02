@@ -77,10 +77,7 @@ export const AppLayout = () => {
         {/* Logo */}
         <div className="px-5 py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
-              <span className="text-white font-bold text-base">N</span>
-            </div>
+            <img src="/logo.svg" alt="Nila Arumbu" className="w-9 h-9 rounded-xl shadow-sm" />
             <div>
               <p className="text-sm font-bold text-slate-900 leading-none">Nila Arumbu</p>
               <p className="text-xs text-slate-400 mt-0.5">Decision Support</p>

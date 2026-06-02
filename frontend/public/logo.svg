@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="55%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="leaf1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a5f3fc"/>
+      <stop offset="100%" stop-color="#6ee7b7"/>
+    </linearGradient>
+    <linearGradient id="leaf2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6ee7b7"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="200" height="200" rx="44" fill="url(#bg)"/>
+
+  <!-- Subtle dot grid overlay -->
+  <circle cx="140" cy="40" r="2" fill="white" fill-opacity="0.15"/>
+  <circle cx="160" cy="55" r="1.5" fill="white" fill-opacity="0.12"/>
+  <circle cx="155" cy="35" r="1.5" fill="white" fill-opacity="0.10"/>
+  <circle cx="170" cy="45" r="1" fill="white" fill-opacity="0.10"/>
+
+  <!-- Child silhouette (simple, friendly) -->
+  <!-- Head -->
+  <circle cx="100" cy="68" r="22" fill="white" fill-opacity="0.95"/>
+  <!-- Body -->
+  <path d="M72 130 Q72 108 100 108 Q128 108 128 130 L128 155 Q100 162 72 155 Z" fill="white" fill-opacity="0.95"/>
+  <!-- Arms -->
+  <path d="M72 118 Q58 114 55 105 Q53 98 60 96 Q67 95 70 103 L74 112 Z" fill="white" fill-opacity="0.90"/>
+  <path d="M128 118 Q142 114 145 105 Q147 98 140 96 Q133 95 130 103 L126 112 Z" fill="white" fill-opacity="0.90"/>
+
+  <!-- Tamil கொம்பு (nila arumbu — moonflower bud) — decorative arc on left -->
+  <path d="M54 78 Q38 62 48 44 Q55 30 72 36" stroke="url(#leaf1)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- Bud tip -->
+  <circle cx="54" cy="79" r="5" fill="#6ee7b7"/>
+  <circle cx="71" cy="36" r="4" fill="#a5f3fc"/>
+
+  <!-- Right arc -->
+  <path d="M146 78 Q162 62 152 44 Q145 30 128 36" stroke="url(#leaf2)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <circle cx="146" cy="79" r="5" fill="#34d399"/>
+  <circle cx="129" cy="36" r="4" fill="#6ee7b7"/>
+
+  <!-- Small star / sparkle above head -->
+  <path d="M100 40 L102 46 L108 46 L103 50 L105 56 L100 52 L95 56 L97 50 L92 46 L98 46 Z" fill="white" fill-opacity="0.80"/>
+</svg>
