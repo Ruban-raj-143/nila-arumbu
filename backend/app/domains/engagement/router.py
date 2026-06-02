@@ -31,7 +31,7 @@ class WhatsAppRequest(BaseModel):
     template_data: dict = {}
 
 
-@router.post("/whatsapp", status_code=status.HTTP_200_OK)
+@router.post("/whatsapp/", status_code=status.HTTP_200_OK)
 async def send_whatsapp_to_parent(
     body: WhatsAppRequest,
     token: TokenPayload = Depends(get_current_token),
