@@ -64,7 +64,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        return ["*"]  # Allow all origins
+        return ["*"]  # Allow all — no CORS restrictions for this deployment
 
     # ── Rate Limiting ─────────────────────────────────────────────────────────
     RATE_LIMIT_PER_MINUTE: int = 100
