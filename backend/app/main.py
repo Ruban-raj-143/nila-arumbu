@@ -135,20 +135,9 @@ else:
 logger.info("Frontend dist path: %s | exists: %s", FRONTEND_DIST, FRONTEND_DIST.exists())
 
 if FRONTEND_DIST.exists():
-    # Serve static assets (JS/CSS/images)
-    _assets_dir = FRONTEND_DIST / "assets"
-    if _assets_dir.exists():
-        app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
-
-    @app.get("/", include_in_schema=False)
-    @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_frontend(request: Request, full_path: str = "") -> FileResponse:
-        # Never intercept API routes — let FastAPI handle them
-        if full_path.startswith("api/"):
-            from fastapi import HTTPException
-            raise HTTPException(status_code=404, detail="API route not found")
-        index = FRONTEND_DIST / "index.html"
-        return FileResponse(str(index))
+    # Mount all static files directly under root
+    # StaticFiles with html=True handles SPA routing (serves index.html for unknown paths)
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
 else:
     @app.get("/", tags=["System"])
     async def root() -> dict:
