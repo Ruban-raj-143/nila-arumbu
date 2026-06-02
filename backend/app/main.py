@@ -119,20 +119,30 @@ async def health() -> dict:
 
 
 # ── Serve React frontend (production) ────────────────────────────────────────
-# Dockerfile places frontend dist at /app/frontend/dist
-# main.py is at /app/backend/app/main.py  →  parent×3 = /app
-FRONTEND_DIST = Path(__file__).parent.parent.parent / "frontend" / "dist"
+# Check env var first, then fall back to relative path calculation
+import os
+
+_frontend_env = os.environ.get("FRONTEND_DIST_PATH", "")
+if _frontend_env:
+    FRONTEND_DIST = Path(_frontend_env)
+else:
+    # Dockerfile: WORKDIR /app/backend, frontend copied to /app/frontend/dist
+    FRONTEND_DIST = Path("/app/frontend/dist")
+    # Local dev fallback
+    if not FRONTEND_DIST.exists():
+        FRONTEND_DIST = Path(__file__).parent.parent.parent / "frontend" / "dist"
 
 logger.info("Frontend dist path: %s | exists: %s", FRONTEND_DIST, FRONTEND_DIST.exists())
 
 if FRONTEND_DIST.exists():
     # Serve static assets (JS/CSS/images)
-    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+    _assets_dir = FRONTEND_DIST / "assets"
+    if _assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
 
     @app.get("/", include_in_schema=False)
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_frontend(request: Request, full_path: str = "") -> FileResponse:
-        # API routes already handled above — only SPA routes reach here
         index = FRONTEND_DIST / "index.html"
         return FileResponse(str(index))
 else:
