@@ -32,4 +32,4 @@ WORKDIR /app/backend
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python3 -m alembic upgrade head && python3 scripts/seed.py && python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "cd /app/backend && python3 -m alembic upgrade head && python3 scripts/seed.py && python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
