@@ -35,7 +35,7 @@ aiofiles==24.1.0
 twilio==9.3.7
 
 # Voice — Tamil Speech Recognition
-openai-whisper
+# openai-whisper  # disabled — heavy PyTorch dep, install separately if needed
 
 # Testing
 pytest==8.3.4
