@@ -58,6 +58,7 @@ app = FastAPI(
     docs_url=f"{settings.API_V1_STR}/docs",
     redoc_url=f"{settings.API_V1_STR}/redoc",
     lifespan=lifespan,
+    redirect_slashes=False,
 )
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
@@ -135,31 +136,27 @@ else:
 logger.info("Frontend dist path: %s | exists: %s", FRONTEND_DIST, FRONTEND_DIST.exists())
 
 if FRONTEND_DIST.exists():
-    # Mount assets folder for static files (JS, CSS, images)
+    # Serve /assets/* statically
     _assets_dir = FRONTEND_DIST / "assets"
     if _assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
 
-    # SPA fallback — serve index.html for all non-API routes
-    from starlette.middleware.base import BaseHTTPMiddleware
-    from starlette.responses import HTMLResponse
+    # Serve other public files (favicon, manifest, etc.)
+    @app.get("/favicon.svg", include_in_schema=False)
+    @app.get("/manifest.webmanifest", include_in_schema=False)
+    @app.get("/registerSW.js", include_in_schema=False)
+    @app.get("/icons.svg", include_in_schema=False)
+    @app.get("/logo.svg", include_in_schema=False)
+    async def serve_public(request: Request) -> FileResponse:
+        filename = request.url.path.lstrip("/")
+        filepath = FRONTEND_DIST / filename
+        if filepath.exists():
+            return FileResponse(str(filepath))
+        return FileResponse(str(FRONTEND_DIST / "index.html"))
 
-    class SPAMiddleware(BaseHTTPMiddleware):
-        async def dispatch(self, request, call_next):
-            response = await call_next(request)
-            # If path doesn't start with /api and got 404, serve SPA
-            if (response.status_code == 404
-                    and not request.url.path.startswith("/api")
-                    and not request.url.path.startswith("/assets")
-                    and not request.url.path.startswith("/health")):
-                index = FRONTEND_DIST / "index.html"
-                return HTMLResponse(index.read_text())
-            return response
-
-    app.add_middleware(SPAMiddleware)
-
-    @app.get("/", include_in_schema=False)
-    async def serve_root() -> FileResponse:
+    # SPA root — must be last
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(full_path: str) -> FileResponse:
         return FileResponse(str(FRONTEND_DIST / "index.html"))
 
 else:
