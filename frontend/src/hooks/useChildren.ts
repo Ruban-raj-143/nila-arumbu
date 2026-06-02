@@ -19,7 +19,8 @@ export function useChildren(centreId?: string) {
           ? `/children?centre_id=${centreId}&size=100`
           : '/children?size=100';
         const res = await api.get<PagedResponse<ChildRead>>(path);
-        // Cache in IndexedDB for offline access
+        // Refresh IndexedDB cache with latest from server
+        await db.children.clear();
         await db.children.bulkPut(
           res.items.map((c) => ({ ...c, _syncStatus: 'synced' as const })),
         );
@@ -29,7 +30,9 @@ export function useChildren(centreId?: string) {
         return db.children.toArray();
       }
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
 
