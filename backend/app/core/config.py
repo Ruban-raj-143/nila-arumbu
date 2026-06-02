@@ -64,11 +64,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        if self.ENVIRONMENT == "development":
-            return ["*"]
-        return self.ALLOWED_ORIGINS + (
-            [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
-        )
+        return ["*"]  # Allow all origins — restrict in production if needed
 
     # ── Rate Limiting ─────────────────────────────────────────────────────────
     RATE_LIMIT_PER_MINUTE: int = 100
