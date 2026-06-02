@@ -135,9 +135,33 @@ else:
 logger.info("Frontend dist path: %s | exists: %s", FRONTEND_DIST, FRONTEND_DIST.exists())
 
 if FRONTEND_DIST.exists():
-    # Mount all static files directly under root
-    # StaticFiles with html=True handles SPA routing (serves index.html for unknown paths)
-    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
+    # Mount assets folder for static files (JS, CSS, images)
+    _assets_dir = FRONTEND_DIST / "assets"
+    if _assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
+
+    # SPA fallback — serve index.html for all non-API routes
+    from starlette.middleware.base import BaseHTTPMiddleware
+    from starlette.responses import HTMLResponse
+
+    class SPAMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            response = await call_next(request)
+            # If path doesn't start with /api and got 404, serve SPA
+            if (response.status_code == 404
+                    and not request.url.path.startswith("/api")
+                    and not request.url.path.startswith("/assets")
+                    and not request.url.path.startswith("/health")):
+                index = FRONTEND_DIST / "index.html"
+                return HTMLResponse(index.read_text())
+            return response
+
+    app.add_middleware(SPAMiddleware)
+
+    @app.get("/", include_in_schema=False)
+    async def serve_root() -> FileResponse:
+        return FileResponse(str(FRONTEND_DIST / "index.html"))
+
 else:
     @app.get("/", tags=["System"])
     async def root() -> dict:
