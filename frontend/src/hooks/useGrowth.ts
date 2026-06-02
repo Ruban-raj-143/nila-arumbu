@@ -55,7 +55,7 @@ export function useRecordGrowth() {
       notes?: string;
     }) => {
       try {
-        const record = await api.post<GrowthRecordRead>('/growth', data);
+        const record = await api.post<GrowthRecordRead>('/growth/', data);
         await db.growthRecords.put({ ...record, _syncStatus: 'synced' });
         return record;
       } catch {
@@ -78,7 +78,7 @@ export function useRecordGrowth() {
         await enqueue({
           action: 'CREATE',
           entity: 'GROWTH',
-          endpoint: '/growth',
+          endpoint: '/growth/',
           method: 'POST',
           payload: data,
         });

@@ -64,7 +64,7 @@ export function useRegisterChild() {
   return useMutation({
     mutationFn: async (data: ChildCreate) => {
       try {
-        const child = await api.post<ChildRead>('/children', data);
+        const child = await api.post<ChildRead>('/children/', data);
         await db.children.put({ ...child, _syncStatus: 'synced' });
         return child;
       } catch {

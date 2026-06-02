@@ -27,7 +27,7 @@ export function useCalculateRisk() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      api.post<RiskScoreRead>('/risk/calculate', data),
+      api.post<RiskScoreRead>('/risk/calculate/', data),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: queryKeys.risk.latest(data.child_id) });
       qc.invalidateQueries({ queryKey: queryKeys.risk.history(data.child_id) });

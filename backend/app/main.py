@@ -58,7 +58,6 @@ app = FastAPI(
     docs_url=f"{settings.API_V1_STR}/docs",
     redoc_url=f"{settings.API_V1_STR}/redoc",
     lifespan=lifespan,
-    redirect_slashes=False,
 )
 
 # ── CORS ──────────────────────────────────────────────────────────────────────

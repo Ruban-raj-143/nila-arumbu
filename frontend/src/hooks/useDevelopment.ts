@@ -36,7 +36,7 @@ export function useRecordAssessment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      api.post<AssessmentRead>('/development/assessments', data),
+      api.post<AssessmentRead>('/development/assessments/', data),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: queryKeys.development.byChild(data.child_id) });
       qc.invalidateQueries({ queryKey: queryKeys.development.summary(data.child_id) });
