@@ -143,6 +143,10 @@ if FRONTEND_DIST.exists():
     @app.get("/", include_in_schema=False)
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_frontend(request: Request, full_path: str = "") -> FileResponse:
+        # Never intercept API routes — let FastAPI handle them
+        if full_path.startswith("api/"):
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="API route not found")
         index = FRONTEND_DIST / "index.html"
         return FileResponse(str(index))
 else:
