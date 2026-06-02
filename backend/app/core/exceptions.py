@@ -29,7 +29,7 @@ class ConflictError(NilaBaseError):
 
 
 class ValidationError(NilaBaseError):
-    http_status = status.HTTP_422_UNPROCESSABLE_CONTENT
+    http_status = status.HTTP_422_UNPROCESSABLE_ENTITY
     detail = "Validation failed."
 
 
