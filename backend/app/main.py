@@ -141,16 +141,28 @@ if FRONTEND_DIST.exists():
     if _assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
 
-    async def _spa(request: Request) -> FileResponse:
-        """SPA catch-all — only called for non-API paths."""
-        return FileResponse(str(FRONTEND_DIST / "index.html"))
+    # Serve public files explicitly
+    for _fname in ["favicon.svg", "logo.svg", "manifest.webmanifest", "registerSW.js", "icons.svg"]:
+        _fpath = FRONTEND_DIST / _fname
+        if _fpath.exists():
+            app.mount(f"/{_fname}", StaticFiles(directory=str(FRONTEND_DIST), html=False), name=f"static_{_fname}")
 
-    # Mount ALL remaining paths via Starlette Route AFTER all FastAPI routes
-    # Using app.router.add_route so it sits below all existing routes
-    from starlette.routing import Route as StarletteRoute
-    app.router.routes.append(
-        StarletteRoute("/{full_path:path}", endpoint=_spa, methods=["GET"])
-    )
+    # 404 handler — serves SPA index.html for all non-API 404s
+    from fastapi import HTTPException as _HTTPException
+    from fastapi.responses import HTMLResponse as _HTMLResponse
+
+    @app.exception_handler(404)
+    async def spa_404_handler(request: Request, exc: _HTTPException) -> _HTMLResponse | JSONResponse:
+        # API routes should return JSON 404
+        if request.url.path.startswith("/api/"):
+            return JSONResponse({"detail": "Not found"}, status_code=404)
+        # All other 404s → serve SPA
+        index = FRONTEND_DIST / "index.html"
+        return _HTMLResponse(index.read_text(), status_code=200)
+
+    @app.get("/", include_in_schema=False)
+    async def serve_root() -> FileResponse:
+        return FileResponse(str(FRONTEND_DIST / "index.html"))
 
 else:
     @app.get("/", tags=["System"])

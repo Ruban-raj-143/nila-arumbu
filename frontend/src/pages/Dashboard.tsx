@@ -20,8 +20,8 @@ const QUICK_ACTIONS = [
 
 export const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
-  const { data: children = [], isLoading } = useChildren();
+  const { user, isAuthenticated } = useAuthStore();
+  const { data: children = [], isLoading, isFetching } = useChildren();
   const { data: pendingReferrals } = useReferralsByStatus('APPOINTMENT_PENDING');
   const { data: followupReferrals } = useReferralsByStatus('FOLLOWUP');
 
@@ -32,7 +32,7 @@ export const Dashboard = () => {
     ...(followupReferrals?.items ?? []),
   ].filter((r) => r.escalated).slice(0, 3);
 
-  if (isLoading) return <PageSpinner />;
+  if (isLoading || isFetching) return <PageSpinner />;
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';

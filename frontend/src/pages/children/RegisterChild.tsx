@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { FiArrowLeft, FiSave } from 'react-icons/fi';
 import { useRegisterChild } from '../../hooks/useChildren';
+import { useAuthStore } from '../../store/auth';
 import { Spinner } from '../../components/ui/Spinner';
 
 const schema = z.object({
@@ -46,6 +47,7 @@ function Field({
 
 export const RegisterChild = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const { mutateAsync: registerChild } = useRegisterChild();
 
   const {
@@ -58,9 +60,15 @@ export const RegisterChild = () => {
     const payload = {
       ...data,
       aadhaar_number: data.aadhaar_number || undefined,
+      centre_id: user?.centre_id ?? undefined,  // auto-assign worker's centre
     };
-    await registerChild(payload as Parameters<typeof registerChild>[0]);
-    navigate('/children');
+    try {
+      await registerChild(payload as Parameters<typeof registerChild>[0]);
+      navigate('/children');
+    } catch (err: unknown) {
+      const msg = (err as { detail?: string })?.detail ?? 'Registration failed';
+      alert(msg);
+    }
   };
 
   return (

@@ -18,8 +18,8 @@ export function useChildren(centreId?: string) {
     enabled: isAuthenticated,  // only fetch when logged in
     queryFn: async () => {
       const path = centreId
-        ? `/children?centre_id=${centreId}&size=100`
-        : '/children?size=100';
+        ? `/children/?centre_id=${centreId}&size=100`
+        : '/children/?size=100';
       const res = await api.get<PagedResponse<ChildRead>>(path);
       try {
         await db.children.clear();
