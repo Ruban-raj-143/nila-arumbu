@@ -349,10 +349,11 @@ async def seed() -> None:
                 obj = Centre(**c)
                 session.add(obj)
                 await session.flush()
-                centre_objs.append(obj)
                 print(f"  ✓ Centre: {c['name']}")
+                centre_objs.append(obj)
             else:
                 centre_objs.append(existing)
+                print(f"  · Centre exists: {c['name']}")
 
         # ── Users ─────────────────────────────────────────────────────────────
         for udata, role_name, centre_idx in [
@@ -380,10 +381,15 @@ async def seed() -> None:
         print(f"\n  🧒 Seeding {len(CHILDREN_DATA)} children with records…")
         for i, cd in enumerate(CHILDREN_DATA):
             centre = centre_objs[cd["centre_idx"]]
+            aadhaar_clean = cd["aadhaar"].replace(" ", "")
 
-            # Skip if already exists (idempotent by aadhaar)
+            # Idempotent by name + dob
             res = await session.execute(
-                select(Child).where(Child.aadhaar_number == cd["aadhaar"])
+                select(Child).where(
+                    Child.first_name == cd["first_name"],
+                    Child.last_name == cd["last_name"],
+                    Child.date_of_birth == cd["dob"],
+                )
             )
             child = res.scalar_one_or_none()
             if child is None:
@@ -392,15 +398,17 @@ async def seed() -> None:
                     last_name=cd["last_name"],
                     date_of_birth=cd["dob"],
                     gender=cd["gender"],
-                    aadhaar_number=cd["aadhaar"],
+                    aadhaar_number=aadhaar_clean,
                     mother_name=cd["mother_name"],
                     father_name=cd["father_name"],
                     guardian_name=cd["mother_name"],
                     guardian_phone=cd["guardian_phone"],
+                    address=f"{centre.village}, {centre.district}",
                     centre_id=centre.id,
                 )
                 session.add(child)
                 await session.flush()
+                print(f"    + {child.first_name} {child.last_name}")
 
             # ── Growth record (latest measurement) ────────────────────────────
             res = await session.execute(
@@ -508,7 +516,6 @@ async def seed() -> None:
                 select(ChildPassport).where(ChildPassport.child_id == child.id)
             )
             if res.scalar_one_or_none() is None:
-                import uuid as _uuid
                 passport_no = f"NP-{TODAY.year}-{str(child.id)[:8].upper()}"
                 session.add(ChildPassport(
                     child_id=child.id,
