@@ -19,16 +19,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Python deps (install without whisper first for faster builds)
-COPY backend/requirements.txt ./
-# Install all deps except openai-whisper (heavy) separately
+# Python deps
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
+# Copy backend code → /app/backend/
 COPY backend/ ./backend/
 
-# Copy built frontend into expected location
+# Copy built frontend → /app/frontend/dist/
+# main.py resolves: /app/backend/app/main.py → parent×3 = /app → /app/frontend/dist
 COPY --from=frontend-builder /frontend/dist ./frontend/dist
+
+# Verify the path exists at build time
+RUN ls -la /app/frontend/dist/
 
 WORKDIR /app/backend
 
