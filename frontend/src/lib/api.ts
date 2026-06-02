@@ -53,7 +53,7 @@ async function request<T>(
     headers['Authorization'] = `Bearer ${auth.access_token}`;
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers, redirect: 'follow' });
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 
   // Token expired — attempt refresh once
   if (res.status === 401 && retry && auth?.refresh_token) {

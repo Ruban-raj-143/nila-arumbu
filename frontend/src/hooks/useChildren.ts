@@ -7,34 +7,27 @@ import { api, type PagedResponse } from '../lib/api';
 import { queryKeys } from '../lib/queryKeys';
 import type { ChildCreate, ChildRead } from '../lib/types';
 import { db, enqueue } from '../store/db';
-import { useAuthStore } from '../store/auth';
 
 // ── List children ─────────────────────────────────────────────────────────────
 
 export function useChildren(centreId?: string) {
-  const { isAuthenticated } = useAuthStore();
   return useQuery({
     queryKey: queryKeys.children.all(centreId),
-    enabled: isAuthenticated,  // only fetch when logged in
     queryFn: async () => {
-      const path = centreId
-        ? `/children/?centre_id=${centreId}&size=100`
-        : '/children/?size=100';
-      const res = await api.get<PagedResponse<ChildRead>>(path);
       try {
-        await db.children.clear();
+        const path = centreId
+          ? `/children?centre_id=${centreId}&size=100`
+          : '/children?size=100';
+        const res = await api.get<PagedResponse<ChildRead>>(path);
         await db.children.bulkPut(
           res.items.map((c) => ({ ...c, _syncStatus: 'synced' as const })),
         );
+        return res.items;
       } catch {
-        // IndexedDB failure is non-fatal
+        return db.children.toArray();
       }
-      return res.items;
     },
-    staleTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    retry: 2,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -64,11 +57,10 @@ export function useRegisterChild() {
   return useMutation({
     mutationFn: async (data: ChildCreate) => {
       try {
-        const child = await api.post<ChildRead>('/children/', data);
+        const child = await api.post<ChildRead>('/children', data);
         await db.children.put({ ...child, _syncStatus: 'synced' });
         return child;
       } catch {
-        // Offline — create locally and queue for sync
         const tempId = `offline-${Date.now()}`;
         const offlineChild: ChildRead = {
           id: tempId,

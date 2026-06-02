@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '../store/auth';
 import { Spinner } from '../components/ui/Spinner';
+import { Logo } from '../components/ui/Logo';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -41,7 +42,7 @@ export const Login = () => {
           style={{ backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)', backgroundSize: '28px 28px' }} />
         <div className="relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-8 shadow-lg">
-            <img src="/logo.svg" alt="Nila Arumbu" className="w-10 h-10" />
+            <Logo size={40} />
           </div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
             Nila Arumbu
@@ -76,7 +77,7 @@ export const Login = () => {
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <img src="/logo.svg" alt="Nila Arumbu" className="w-10 h-10 rounded-xl shadow" />
+            <Logo size={40} />
             <span className="text-xl font-bold text-slate-900">Nila Arumbu</span>
           </div>
 

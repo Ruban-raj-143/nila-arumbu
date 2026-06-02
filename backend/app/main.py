@@ -4,14 +4,11 @@ Every Child Seen. Every Risk Identified. Every Referral Closed.
 """
 import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
 from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
 from app.core.config import settings
 from app.core.exceptions import NilaBaseError
@@ -70,7 +67,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Global exception handler ──────────────────────────────────────────────────
+# ── Global exception handlers ─────────────────────────────────────────────────
 
 @app.exception_handler(NilaBaseError)
 async def nila_exception_handler(request: Request, exc: NilaBaseError) -> JSONResponse:
@@ -118,52 +115,6 @@ async def health() -> dict:
     }
 
 
-# ── Serve React frontend (production) ────────────────────────────────────────
-# Check env var first, then fall back to relative path calculation
-import os
-
-_frontend_env = os.environ.get("FRONTEND_DIST_PATH", "")
-if _frontend_env:
-    FRONTEND_DIST = Path(_frontend_env)
-else:
-    # Dockerfile: WORKDIR /app/backend, frontend copied to /app/frontend/dist
-    FRONTEND_DIST = Path("/app/frontend/dist")
-    # Local dev fallback
-    if not FRONTEND_DIST.exists():
-        FRONTEND_DIST = Path(__file__).parent.parent.parent / "frontend" / "dist"
-
-logger.info("Frontend dist path: %s | exists: %s", FRONTEND_DIST, FRONTEND_DIST.exists())
-
-if FRONTEND_DIST.exists():
-    # Serve /assets/* statically (JS, CSS, images)
-    _assets_dir = FRONTEND_DIST / "assets"
-    if _assets_dir.exists():
-        app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
-
-    # Serve public files explicitly
-    for _fname in ["favicon.svg", "logo.svg", "manifest.webmanifest", "registerSW.js", "icons.svg"]:
-        _fpath = FRONTEND_DIST / _fname
-        if _fpath.exists():
-            app.mount(f"/{_fname}", StaticFiles(directory=str(FRONTEND_DIST), html=False), name=f"static_{_fname}")
-
-    # 404 handler — serves SPA index.html for all non-API 404s
-    from fastapi import HTTPException as _HTTPException
-    from fastapi.responses import HTMLResponse as _HTMLResponse
-
-    @app.exception_handler(404)
-    async def spa_404_handler(request: Request, exc: _HTTPException) -> _HTMLResponse | JSONResponse:
-        # API routes should return JSON 404
-        if request.url.path.startswith("/api/"):
-            return JSONResponse({"detail": "Not found"}, status_code=404)
-        # All other 404s → serve SPA
-        index = FRONTEND_DIST / "index.html"
-        return _HTMLResponse(index.read_text(), status_code=200)
-
-    @app.get("/", include_in_schema=False)
-    async def serve_root() -> FileResponse:
-        return FileResponse(str(FRONTEND_DIST / "index.html"))
-
-else:
-    @app.get("/", tags=["System"])
-    async def root() -> dict:
-        return {"message": "Nila Arumbu API — Every Child Seen. Every Risk Identified. Every Referral Closed."}
+@app.get("/", tags=["System"])
+async def root() -> dict:
+    return {"message": "Nila Arumbu API — Every Child Seen. Every Risk Identified. Every Referral Closed."}

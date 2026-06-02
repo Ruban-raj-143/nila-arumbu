@@ -52,7 +52,7 @@ export const EngagementPage = () => {
       : `+91${data.parent_phone.replace(/\s/g, '')}`;
 
     const res = await api.post<{ success: boolean; message_preview: string }>(
-      '/engagement/whatsapp',
+      '/engagement/whatsapp/',
       { ...data, parent_phone: phone },
     );
     setPreview(res.message_preview);

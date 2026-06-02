@@ -40,7 +40,7 @@ export function useRecordAttendance() {
   return useMutation({
     mutationFn: async (data: AttendanceCreate) => {
       try {
-        const record = await api.post<AttendanceRead>('/attendance/', data);
+        const record = await api.post<AttendanceRead>('/attendance', data);
         await db.attendance.put({ ...record, _syncStatus: 'synced' });
         return record;
       } catch {
@@ -56,7 +56,7 @@ export function useRecordAttendance() {
         await enqueue({
           action: 'CREATE',
           entity: 'ATTENDANCE',
-          endpoint: '/attendance/',
+          endpoint: '/attendance',
           method: 'POST',
           payload: data,
         });

@@ -28,7 +28,7 @@ export function useCreateReferral() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      api.post<ReferralRead>('/referrals/', data),
+      api.post<ReferralRead>('/referrals', data),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: queryKeys.referrals.byChild(data.child_id) });
     },

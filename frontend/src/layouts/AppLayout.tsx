@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import { useAuthStore } from '../store/auth';
 import { SyncIndicator } from '../components/ui/SyncIndicator';
+import { Logo } from '../components/ui/Logo';
 
 const NAV = [
   { to: '/',            label: 'Dashboard',   icon: FiHome,          end: true,  group: 'main' },
@@ -77,7 +78,7 @@ export const AppLayout = () => {
         {/* Logo */}
         <div className="px-5 py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="Nila Arumbu" className="w-9 h-9 rounded-xl shadow-sm" />
+            <Logo size={36} />
             <div>
               <p className="text-sm font-bold text-slate-900 leading-none">Nila Arumbu</p>
               <p className="text-xs text-slate-400 mt-0.5">Decision Support</p>
