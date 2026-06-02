@@ -29,6 +29,7 @@ celery==5.4.0
 
 # HTTP client
 httpx==0.28.1
+aiofiles==24.1.0
 
 # Twilio (WhatsApp + SMS)
 twilio==9.3.7

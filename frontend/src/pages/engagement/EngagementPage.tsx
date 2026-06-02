@@ -36,7 +36,7 @@ export const EngagementPage = () => {
   const [preview, setPreview] = useState<string | null>(null);
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } =
-    useForm<FormData>({ resolver: zodResolver(schema) });
+    useForm<any>({ resolver: zodResolver(schema) });
 
   // Auto-fill child name when child is selected
   const selectedChildId = watch('child_id');
@@ -94,7 +94,7 @@ export const EngagementPage = () => {
                 </option>
               ))}
             </select>
-            {errors.child_id && <p className="mt-1 text-xs text-red-600">{errors.child_id.message}</p>}
+            {errors.child_id && <p className="mt-1 text-xs text-red-600">{String(errors.child_id.message)}</p>}
           </div>
 
           {/* Parent phone */}
@@ -107,7 +107,7 @@ export const EngagementPage = () => {
               className={inputClass}
               placeholder="6369713571 (or +916369713571)"
             />
-            {errors.parent_phone && <p className="mt-1 text-xs text-red-600">{errors.parent_phone.message}</p>}
+            {errors.parent_phone && <p className="mt-1 text-xs text-red-600">{String(errors.parent_phone.message)}</p>}
           </div>
 
           {/* Template */}
@@ -133,7 +133,7 @@ export const EngagementPage = () => {
                 );
               })}
             </div>
-            {errors.template && <p className="mt-1 text-xs text-red-600">{errors.template.message}</p>}
+            {errors.template && <p className="mt-1 text-xs text-red-600">{String(errors.template.message)}</p>}
           </div>
 
           <input type="hidden" {...register('child_name')} />

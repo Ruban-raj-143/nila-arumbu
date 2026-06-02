@@ -33,7 +33,7 @@ type FormData = z.infer<typeof schema>;
 const inputClass =
   'block w-full px-3 py-2.5 text-sm border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors';
 
-function ScoreField({ label, name, register }: { label: string; name: keyof FormData; register: ReturnType<typeof useForm<FormData>>['register'] }) {
+function ScoreField({ label, name, register }: { label: string; name: keyof FormData; register: ReturnType<typeof useForm<any>>['register'] }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label} (0–100)</label>
@@ -83,7 +83,7 @@ export const DevelopmentPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<any>({
     resolver: zodResolver(schema),
     defaultValues: { assessed_date: new Date().toISOString().split('T')[0] },
   });

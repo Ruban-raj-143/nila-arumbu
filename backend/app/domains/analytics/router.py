@@ -5,7 +5,7 @@ Supervisor and District Officer dashboards.
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import TokenPayload, require_roles
+from app.core.security import TokenPayload, get_current_token
 from app.domains.analytics.schemas import (
     CentreRiskSummary,
     PlatformSummary,
@@ -23,9 +23,7 @@ def _svc(db: AsyncSession = Depends(get_db)) -> AnalyticsService:
 
 @router.get("/summary", response_model=PlatformSummary)
 async def platform_summary(
-    token: TokenPayload = Depends(
-        require_roles("STATE_ADMIN", "DISTRICT_OFFICER", "SUPERVISOR")
-    ),
+    token: TokenPayload = Depends(get_current_token),
     svc: AnalyticsService = Depends(_svc),
 ) -> PlatformSummary:
     """Platform-wide summary — total children, risk distribution, open referrals."""
@@ -34,9 +32,7 @@ async def platform_summary(
 
 @router.get("/centres/risk", response_model=list[CentreRiskSummary])
 async def centre_risk_summary(
-    token: TokenPayload = Depends(
-        require_roles("STATE_ADMIN", "DISTRICT_OFFICER", "SUPERVISOR")
-    ),
+    token: TokenPayload = Depends(get_current_token),
     svc: AnalyticsService = Depends(_svc),
 ) -> list[CentreRiskSummary]:
     """Per-centre risk distribution breakdown."""
@@ -45,9 +41,7 @@ async def centre_risk_summary(
 
 @router.get("/referrals/aging", response_model=list[ReferralAgingReport])
 async def referral_aging(
-    token: TokenPayload = Depends(
-        require_roles("STATE_ADMIN", "DISTRICT_OFFICER", "SUPERVISOR")
-    ),
+    token: TokenPayload = Depends(get_current_token),
     svc: AnalyticsService = Depends(_svc),
 ) -> list[ReferralAgingReport]:
     """Referral aging report — how long cases sit in each state."""

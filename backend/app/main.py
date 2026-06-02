@@ -4,11 +4,14 @@ Every Child Seen. Every Risk Identified. Every Referral Closed.
 """
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.core.config import settings
 from app.core.exceptions import NilaBaseError
@@ -118,3 +121,16 @@ async def health() -> dict:
 @app.get("/", tags=["System"])
 async def root() -> dict:
     return {"message": "Nila Arumbu API — Every Child Seen. Every Risk Identified. Every Referral Closed."}
+
+
+# ── Serve React frontend (production) ────────────────────────────────────────
+
+FRONTEND_DIST = Path(__file__).parent.parent.parent / "frontend" / "dist"
+
+if FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_frontend(full_path: str, request: Request) -> FileResponse:
+        index = FRONTEND_DIST / "index.html"
+        return FileResponse(str(index))

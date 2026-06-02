@@ -1,23 +1,22 @@
 import React from 'react';
 import type { ReferralStatus } from '../../lib/types';
 
-const CONFIG: Record<ReferralStatus, { label: string; classes: string }> = {
-  IDENTIFIED:          { label: 'Identified',          classes: 'bg-gray-100 text-gray-700 border-gray-200' },
-  REFERRED:            { label: 'Referred',             classes: 'bg-blue-100 text-blue-800 border-blue-200' },
-  APPOINTMENT_PENDING: { label: 'Appt. Pending',        classes: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-  VISITED:             { label: 'Visited',              classes: 'bg-purple-100 text-purple-800 border-purple-200' },
-  FOLLOWUP:            { label: 'Follow-Up',            classes: 'bg-orange-100 text-orange-800 border-orange-200' },
-  CLOSED:              { label: 'Closed',               classes: 'bg-green-100 text-green-800 border-green-200' },
+const CONFIG: Record<ReferralStatus, { label: string; bg: string; text: string }> = {
+  IDENTIFIED:          { label: 'Identified',    bg: '#f1f5f9', text: '#64748b' },
+  REFERRED:            { label: 'Referred',      bg: '#eff6ff', text: '#3b82f6' },
+  APPOINTMENT_PENDING: { label: 'Appt. Pending', bg: '#fffbeb', text: '#d97706' },
+  VISITED:             { label: 'Visited',       bg: '#f5f3ff', text: '#7c3aed' },
+  FOLLOWUP:            { label: 'Follow-Up',     bg: '#fff7ed', text: '#ea580c' },
+  CLOSED:              { label: 'Closed',        bg: '#f0fdf4', text: '#16a34a' },
 };
 
-interface Props {
-  status: ReferralStatus;
-}
-
-export function StatusBadge({ status }: Props) {
+export function StatusBadge({ status }: { status: ReferralStatus }) {
   const cfg = CONFIG[status] ?? CONFIG.IDENTIFIED;
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${cfg.classes}`}>
+    <span
+      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap"
+      style={{ background: cfg.bg, color: cfg.text }}
+    >
       {cfg.label}
     </span>
   );

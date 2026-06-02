@@ -69,7 +69,7 @@ export function useRecordGrowth() {
           muac_cm: data.muac_cm ?? null,
           weight_for_age_z: null,
           height_for_age_z: null,
-          weight_for_height_z: null,
+          // weight_for_height_z omitted
           nutrition_status: null,
           notes: data.notes ?? null,
           created_at: new Date().toISOString(),

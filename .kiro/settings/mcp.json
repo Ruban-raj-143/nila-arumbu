@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "figma-mcp"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "REPLACE_WITH_YOUR_FIGMA_TOKEN",
+        "FIGMA_API_KEY": "REPLACE_WITH_YOUR_FIGMA_TOKEN"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

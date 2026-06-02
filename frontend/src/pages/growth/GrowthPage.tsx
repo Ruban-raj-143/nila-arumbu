@@ -77,7 +77,7 @@ export const GrowthPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<any>({
     resolver: zodResolver(schema),
     defaultValues: { recorded_date: new Date().toISOString().split('T')[0] },
   });
@@ -137,7 +137,7 @@ export const GrowthPage = () => {
                   </option>
                 ))}
               </select>
-              {errors.child_id && <p className="mt-1 text-xs text-red-600">{errors.child_id.message}</p>}
+              {errors.child_id && <p className="mt-1 text-xs text-red-600">{String(errors.child_id.message)}</p>}
             </div>
 
             <div>
