@@ -7,25 +7,27 @@ import { api, type PagedResponse } from '../lib/api';
 import { queryKeys } from '../lib/queryKeys';
 import type { ChildCreate, ChildRead } from '../lib/types';
 import { db, enqueue } from '../store/db';
+import { useAuthStore } from '../store/auth';
 
 // ── List children ─────────────────────────────────────────────────────────────
 
 export function useChildren(centreId?: string) {
+  const { isAuthenticated } = useAuthStore();
   return useQuery({
     queryKey: queryKeys.children.all(centreId),
+    enabled: isAuthenticated,  // only fetch when logged in
     queryFn: async () => {
       const path = centreId
         ? `/children?centre_id=${centreId}&size=100`
         : '/children?size=100';
       const res = await api.get<PagedResponse<ChildRead>>(path);
-      // Update IndexedDB for offline use
       try {
         await db.children.clear();
         await db.children.bulkPut(
           res.items.map((c) => ({ ...c, _syncStatus: 'synced' as const })),
         );
       } catch {
-        // IndexedDB failure is non-fatal — continue with server data
+        // IndexedDB failure is non-fatal
       }
       return res.items;
     },
