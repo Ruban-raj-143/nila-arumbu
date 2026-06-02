@@ -14,25 +14,25 @@ export function useChildren(centreId?: string) {
   return useQuery({
     queryKey: queryKeys.children.all(centreId),
     queryFn: async () => {
+      const path = centreId
+        ? `/children?centre_id=${centreId}&size=100`
+        : '/children?size=100';
+      const res = await api.get<PagedResponse<ChildRead>>(path);
+      // Update IndexedDB for offline use
       try {
-        const path = centreId
-          ? `/children?centre_id=${centreId}&size=100`
-          : '/children?size=100';
-        const res = await api.get<PagedResponse<ChildRead>>(path);
-        // Refresh IndexedDB cache with latest from server
         await db.children.clear();
         await db.children.bulkPut(
           res.items.map((c) => ({ ...c, _syncStatus: 'synced' as const })),
         );
-        return res.items;
       } catch {
-        // Offline fallback — return from IndexedDB
-        return db.children.toArray();
+        // IndexedDB failure is non-fatal — continue with server data
       }
+      return res.items;
     },
     staleTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    retry: 2,
   });
 }
 
