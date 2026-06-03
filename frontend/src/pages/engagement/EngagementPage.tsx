@@ -152,32 +152,6 @@ export const EngagementPage = () => {
           </button>
         </form>
       </Card>
-
-      {/* Setup guide */}
-      <Card>
-        <CardHeader title="Twilio Setup" subtitle="WhatsApp Business API configure பண்ண" />
-        <ol className="space-y-2 text-sm text-gray-600 list-decimal list-inside">
-          <li>
-            <a href="https://console.twilio.com" target="_blank" rel="noreferrer"
-               className="text-indigo-600 hover:underline">console.twilio.com</a>
-            {' '}போய் account create பண்ணுங்க
-          </li>
-          <li>WhatsApp Sandbox enable பண்ணுங்க (free testing)</li>
-          <li>
-            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">.env</code>
-            {' '}file-ல் credentials போடுங்க:
-            <pre className="mt-1 bg-gray-50 rounded-xl p-3 text-xs overflow-x-auto">
-{`TWILIO_ACCOUNT_SID=ACxxxxxxxx
-TWILIO_AUTH_TOKEN=your_token
-TWILIO_WHATSAPP_FROM=whatsapp:+14155238886`}
-            </pre>
-          </li>
-          <li>Backend restart பண்ணுங்க — messages போகும்!</li>
-        </ol>
-        <p className="mt-3 text-xs text-gray-400">
-          Credentials இல்லாம கூட messages log-ல் காணலாம் (development mode).
-        </p>
-      </Card>
     </div>
   );
 };
